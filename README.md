@@ -46,7 +46,6 @@ cli: nil                               # Additional command-line options to pass
 formatter: nil                         # Formatter to use for output to the console.
 command: 'eslint'                      # Specify a custom path to the eslint command.
 default_paths: ['**/*.js', '**/*.es6'] # The default paths that will be used for "all_on_start".
-no_for_zero: false                     # When displaying "0" for results, use the word "no" instead.
 ```
 
 ## Contributing

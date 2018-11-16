@@ -24,7 +24,6 @@ module Guard
         formatter: nil,
         command: 'eslint',
         default_paths: ['**/*.js', '**/*.es6'],
-        no_for_zero: true,
       }.merge(options)
 
       @failed_paths = []

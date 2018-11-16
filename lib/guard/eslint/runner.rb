@@ -112,7 +112,7 @@ module Guard
         result.reject { |f| f[:messages].empty? }.map { |f| f[:filePath] }
       end
 
-      def pluralize(number, thing)
+      def pluralize(number, thing, options = {})
         text = ''
 
         if number == 0 && options[:no_for_zero]
