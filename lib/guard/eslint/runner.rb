@@ -65,11 +65,18 @@ module Guard
 
       def json_file_path
         @json_file_path ||= begin
+          json_file.close
+          json_file.path
+        end
+      end
+
+      ##
+      # Keep the Tempfile instance around so it isn't garbage-collected and therefore deleted.
+      def json_file
+        @json_file ||= begin
           # Just generate random tempfile path.
           basename = self.class.name.downcase.gsub('::', '_')
-          tempfile = Tempfile.new(basename)
-          tempfile.close
-          tempfile.path
+          Tempfile.new(basename)
         end
       end
 
