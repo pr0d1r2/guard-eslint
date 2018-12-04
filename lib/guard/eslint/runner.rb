@@ -1,6 +1,7 @@
 # coding: utf-8
 
 require 'json'
+require 'open3'
 
 module Guard
   class Eslint
@@ -16,8 +17,7 @@ module Guard
       def run(paths)
         paths = options[:default_paths] unless paths
 
-        command = command_for_check(paths)
-        passed = system(*command)
+        passed = run_for_check(paths)
         case options[:notification]
         when :failed
           notify(passed) unless passed
@@ -28,6 +28,24 @@ module Guard
         run_for_output(paths)
 
         passed
+      end
+
+      def failed_paths
+        result.reject { |f| f[:messages].empty? }.map { |f| f[:filePath] }
+      end
+
+      private
+
+      attr_accessor :check_stdout, :check_stderr
+
+      def run_for_check(paths)
+        command = command_for_check(paths)
+        (stdout, stderr, status) = Open3.capture3(*command)
+        self.check_stdout = stdout
+        self.check_stderr = stderr
+        status
+      rescue SystemCallError => e
+        fail "The eslint command failed with #{e.message}: `#{command}`"
       end
 
       ##
@@ -87,6 +105,8 @@ module Guard
             JSON.parse(file.read, symbolize_names: true)
           end
         end
+      rescue JSON::ParserError
+        fail "eslint JSON output could not be parsed. Output from eslint was:\n#{check_stderr}\n#{check_stdout}"
       end
 
       def notify(passed)
@@ -114,10 +134,6 @@ module Guard
         text << ' detected'
       end
       # rubocop:enable Metric/AbcSize
-
-      def failed_paths
-        result.reject { |f| f[:messages].empty? }.map { |f| f[:filePath] }
-      end
 
       def pluralize(number, thing, options = {})
         text = ''
