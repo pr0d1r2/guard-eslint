@@ -15,7 +15,7 @@ module Guard
       attr_reader :options
 
       def run(paths)
-        paths = options[:default_paths] unless paths
+        paths = options[:default_paths] if paths.empty?
 
         passed = run_for_check(paths)
         case options[:notification]
